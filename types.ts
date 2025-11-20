@@ -1,3 +1,4 @@
+
 export interface Game {
   id: string;
   title: string;
@@ -9,6 +10,7 @@ export interface Game {
   rating: number;
   releaseDate: string;
   features: string[];
+  brand: 'KEY' | 'YUZU' | 'ANIPLEX' | 'OTHER';
 }
 
 export interface CartItem extends Game {
@@ -22,3 +24,5 @@ export interface ChatMessage {
 }
 
 export type ViewState = 'HOME' | 'PRODUCT_DETAILS' | 'CHECKOUT';
+
+export type Language = 'en' | 'zh';

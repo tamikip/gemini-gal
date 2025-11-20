@@ -1,16 +1,21 @@
+
 import React from 'react';
 import { X, Star, ShieldCheck, Cpu, Battery, ShoppingBag } from 'lucide-react';
-import { Game } from '../types';
+import { Game, Language } from '../types';
+import { translations } from '../translations';
 
 interface ProductModalProps {
   game: Game | null;
   isOpen: boolean;
   onClose: () => void;
   onAddToCart: (game: Game) => void;
+  lang: Language;
 }
 
-const ProductModal: React.FC<ProductModalProps> = ({ game, isOpen, onClose, onAddToCart }) => {
+const ProductModal: React.FC<ProductModalProps> = ({ game, isOpen, onClose, onAddToCart, lang }) => {
   if (!isOpen || !game) return null;
+  const t = translations[lang].modal;
+  const tProd = translations[lang].product;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
@@ -32,7 +37,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ game, isOpen, onClose, onAd
             <img src={game.image} alt={game.title} className="max-h-[80vh] object-contain shadow-xl rounded-lg" />
             <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
                 <Star size={16} className="text-yellow-500 fill-yellow-500" />
-                {game.rating} Rating
+                {game.rating} {t.rating}
             </div>
         </div>
 
@@ -57,7 +62,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ game, isOpen, onClose, onAd
                          {idx === 0 ? <Cpu size={20} /> : idx === 1 ? <ShieldCheck size={20} /> : <Battery size={20} />}
                      </div>
                      <div>
-                         <h4 className="font-bold text-sm text-h-dark-gray">Feature {idx + 1}</h4>
+                         <h4 className="font-bold text-sm text-h-dark-gray">{tProd.feature} {idx + 1}</h4>
                          <p className="text-xs text-gray-500">{feature}</p>
                      </div>
                  </div>
@@ -67,27 +72,30 @@ const ProductModal: React.FC<ProductModalProps> = ({ game, isOpen, onClose, onAd
           <div className="mt-auto border-t border-gray-100 pt-8">
              <div className="flex items-center justify-between mb-6">
                  <div>
-                     <p className="text-sm text-gray-400">Total Price</p>
+                     <p className="text-sm text-gray-400">{t.totalPrice}</p>
                      <div className="flex items-baseline gap-2">
-                        <span className="text-4xl font-bold text-h-black">¥{game.price}</span>
-                        {game.originalPrice && <span className="text-xl text-gray-400 line-through">¥{game.originalPrice}</span>}
+                        <span className="text-4xl font-bold text-h-black">{tProd.price}{game.price}</span>
+                        {game.originalPrice && <span className="text-xl text-gray-400 line-through">{tProd.price}{game.originalPrice}</span>}
                      </div>
                  </div>
                  <div className="text-right">
-                     <p className="text-sm text-green-600 font-medium">In Stock</p>
-                     <p className="text-xs text-gray-400">Ships immediately via Cloud</p>
+                     <p className="text-sm text-green-600 font-medium">{t.inStock}</p>
+                     <p className="text-xs text-gray-400">{t.shipping}</p>
                  </div>
              </div>
 
              <div className="flex gap-4">
                  <button 
-                    onClick={() => onAddToCart(game)}
+                    onClick={() => { onAddToCart(game); onClose(); }}
                     className="flex-1 bg-h-red text-white h-14 rounded-xl font-bold text-lg hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
                  >
-                     <ShoppingBag size={20} /> Add to Cart
+                     <ShoppingBag size={20} /> {tProd.addToCart}
                  </button>
-                 <button className="flex-1 border border-gray-300 text-h-dark-gray h-14 rounded-xl font-bold text-lg hover:border-h-black hover:bg-gray-50 transition-colors">
-                     Book Demo
+                 <button 
+                    onClick={() => alert(t.demoAlert)}
+                    className="flex-1 border border-gray-300 text-h-dark-gray h-14 rounded-xl font-bold text-lg hover:border-h-black hover:bg-gray-50 transition-colors"
+                 >
+                     {t.bookDemo}
                  </button>
              </div>
           </div>

@@ -1,18 +1,26 @@
 
 import React from 'react';
 import { ShoppingCart, Heart } from 'lucide-react';
-import { Game } from '../types';
+import { Game, Language } from '../types';
+import { translations } from '../translations';
 
 interface ProductCardProps {
   game: Game;
   onAddToCart: (game: Game) => void;
   onClick: (game: Game) => void;
+  lang: Language;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ game, onAddToCart, onClick }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ game, onAddToCart, onClick, lang }) => {
+  const t = translations[lang].product;
   // Determine badge color
-  const isPromo = game.tags.includes('Promotion');
-  const isNew = game.tags.includes('In Production');
+  // We check tags using English strings from constants if they were hardcoded, but now tags are localized. 
+  // We can check ID or simply assume first tag is type. 
+  // Let's assume if the tag contains 'Flagship' or '旗舰' (Flagship).
+  
+  // Simplified logic for UI purposes based on ID/Tag presence
+  const isPromo = game.tags.some(t => t.includes('Pro') || t.includes('特') || t.includes('Magic')); 
+  const isNew = game.tags.some(t => t.includes('Flagship') || t.includes('旗舰'));
   
   return (
     <div 
@@ -30,7 +38,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ game, onAddToCart, onClick })
         {/* Status Badge */}
         <div className={`absolute top-0 right-0 px-3 py-1 text-xs font-bold text-white rounded-bl-lg z-10
           ${isNew ? 'bg-[#8E24AA]' : isPromo ? 'bg-h-red' : 'bg-gray-800'}`}>
-          {isNew ? 'IN PRODUCTION' : isPromo ? 'PROMOTION' : 'AVAILABLE'}
+          {isNew ? t.inProduction : isPromo ? t.promotion : t.available}
         </div>
 
         {/* Overlay on Hover */}
@@ -57,15 +65,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ game, onAddToCart, onClick })
 
         <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-2">
           <div className="flex flex-col">
-             <span className="text-lg font-bold text-h-red">¥{game.price}</span>
+             <span className="text-lg font-bold text-h-red">{t.price}{game.price}</span>
              {game.originalPrice && (
-                 <span className="text-xs text-gray-400 line-through">¥{game.originalPrice}</span>
+                 <span className="text-xs text-gray-400 line-through">{t.price}{game.originalPrice}</span>
              )}
           </div>
           
           <button 
             onClick={(e) => { e.stopPropagation(); onAddToCart(game); }}
             className="w-10 h-10 rounded-full bg-gray-100 text-h-dark-gray flex items-center justify-center hover:bg-h-red hover:text-white transition-colors"
+            title={t.addToCart}
           >
             <ShoppingCart size={18} />
           </button>

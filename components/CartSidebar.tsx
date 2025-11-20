@@ -1,6 +1,8 @@
+
 import React from 'react';
 import { X, Minus, Plus, Trash2 } from 'lucide-react';
-import { CartItem } from '../types';
+import { CartItem, Language } from '../types';
+import { translations } from '../translations';
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -9,10 +11,12 @@ interface CartSidebarProps {
   onUpdateQuantity: (id: string, delta: number) => void;
   onRemove: (id: string) => void;
   onCheckout: () => void;
+  lang: Language;
 }
 
-const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, cart, onUpdateQuantity, onRemove, onCheckout }) => {
+const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, cart, onUpdateQuantity, onRemove, onCheckout, lang }) => {
   const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const t = translations[lang].cart;
 
   return (
     <>
@@ -26,7 +30,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, cart, onUpda
       <div className={`fixed inset-y-0 right-0 z-50 w-full sm:w-[450px] bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col`}>
         
         <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50">
-          <h2 className="text-2xl font-bold text-h-dark-gray">Your Cart</h2>
+          <h2 className="text-2xl font-bold text-h-dark-gray">{t.title}</h2>
           <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
             <X size={24} />
           </button>
@@ -36,7 +40,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, cart, onUpda
           {cart.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400 space-y-4">
                 <ShoppingBagIcon />
-                <p>Your cart is empty</p>
+                <p>{t.empty}</p>
             </div>
           ) : (
             cart.map(item => (
@@ -45,7 +49,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, cart, onUpda
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <h3 className="font-bold text-h-dark-gray line-clamp-1">{item.title}</h3>
-                    <p className="text-sm text-gray-500">Enterprise Edition</p>
+                    <p className="text-sm text-gray-500">{t.enterprise}</p>
                   </div>
                   <div className="flex items-center justify-between mt-2">
                     <div className="flex items-center border border-gray-200 rounded-lg">
@@ -76,15 +80,15 @@ const CartSidebar: React.FC<CartSidebarProps> = ({ isOpen, onClose, cart, onUpda
 
         <div className="p-6 border-t border-gray-100 bg-gray-50">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-500">Subtotal</span>
+            <span className="text-gray-500">{t.subtotal}</span>
             <span className="text-2xl font-bold text-h-black">¥{total}</span>
           </div>
           <button 
-            onClick={onCheckout}
+            onClick={() => { onCheckout(); alert(t.checkoutAlert); }}
             disabled={cart.length === 0}
             className="w-full bg-h-red text-white py-4 rounded-lg font-bold text-lg hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
           >
-            Checkout
+            {t.checkout}
           </button>
         </div>
       </div>

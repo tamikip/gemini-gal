@@ -1,16 +1,27 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, Sparkles } from 'lucide-react';
 import { sendMessageToGemini } from '../services/geminiService';
-import { ChatMessage } from '../types';
+import { ChatMessage, Language } from '../types';
+import { translations } from '../translations';
 
-const GeminiAssistant: React.FC = () => {
+interface GeminiAssistantProps {
+    lang: Language;
+}
+
+const GeminiAssistant: React.FC<GeminiAssistantProps> = ({ lang }) => {
+  const t = translations[lang].assistant;
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { role: 'model', text: 'Welcome to H-Store. I am your intelligent shopping assistant. How can I optimize your entertainment selection today?' }
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const initialized = useRef(false);
+
+  // Reset welcome message when language changes
+  useEffect(() => {
+    setMessages([{ role: 'model', text: t.welcome }]);
+  }, [lang, t.welcome]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -32,7 +43,7 @@ const GeminiAssistant: React.FC = () => {
       const responseText = await sendMessageToGemini(userText);
       setMessages(prev => [...prev, { role: 'model', text: responseText }]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'model', text: "Communication error. Please retry.", isError: true }]);
+      setMessages(prev => [...prev, { role: 'model', text: t.error, isError: true }]);
     } finally {
       setIsLoading(false);
     }
@@ -50,7 +61,7 @@ const GeminiAssistant: React.FC = () => {
         className={`fixed bottom-8 right-8 z-50 bg-h-red text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform duration-300 ${isOpen ? 'hidden' : 'flex'} items-center gap-2`}
       >
         <Bot size={28} />
-        <span className="font-semibold hidden md:block">Smart Assistant</span>
+        <span className="font-semibold hidden md:block">{t.trigger}</span>
       </button>
 
       {/* Chat Window */}
@@ -63,8 +74,8 @@ const GeminiAssistant: React.FC = () => {
                <Sparkles size={20} className="text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-lg">H-Bot Assistant</h3>
-              <p className="text-xs text-gray-400">Powered by Gemini 2.5</p>
+              <h3 className="font-bold text-lg">{t.title}</h3>
+              <p className="text-xs text-gray-400">{t.subtitle}</p>
             </div>
           </div>
           <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white transition-colors">
@@ -105,7 +116,7 @@ const GeminiAssistant: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Ask about our games..."
+              placeholder={t.placeholder}
               className="flex-1 bg-transparent outline-none text-sm text-h-dark-gray"
             />
             <button 
